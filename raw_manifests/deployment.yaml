@@ -1,0 +1,138 @@
+---
+# Source: karpenter/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: karpenter
+  namespace: default
+  labels:
+    helm.sh/chart: karpenter-0.16.2
+    app.kubernetes.io/name: karpenter
+    app.kubernetes.io/instance: karpenter
+    app.kubernetes.io/version: "0.16.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: karpenter
+      app.kubernetes.io/instance: karpenter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: karpenter
+        app.kubernetes.io/instance: karpenter
+    spec:
+      serviceAccountName: karpenter
+      securityContext:
+        fsGroup: 1000
+      priorityClassName: "system-cluster-critical"
+      dnsPolicy: Default
+      containers:
+        - name: controller
+          image: public.ecr.aws/karpenter/controller:v0.16.2@sha256:fc66e0ba44a69cf22ca5732f885d4c8ab69bd46e3c8758788a7f446103270a32
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KARPENTER_SERVICE
+              value: karpenter
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: MEMORY_LIMIT
+              valueFrom:
+                resourceFieldRef:
+                  containerName: controller
+                  divisor: "0"
+                  resource: limits.memory
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+              protocol: TCP
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            timeoutSeconds: 30
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+            requests:
+              cpu: 1
+              memory: 1Gi
+        - name: webhook
+          image: public.ecr.aws/karpenter/webhook:v0.16.2@sha256:47a74a4ba3437e022faae7ed8823cf501f489e860a8200a365f1c994290ea027
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KUBERNETES_MIN_VERSION
+              value: "1.19.0-0"
+            - name: KARPENTER_SERVICE
+              value: karpenter
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: MEMORY_LIMIT
+              valueFrom:
+                resourceFieldRef:
+                  containerName: webhook
+                  divisor: "0"
+                  resource: limits.memory
+          args:
+            - -port=8443
+          ports:
+            - name: https-webhook
+              containerPort: 8443
+              protocol: TCP
+          livenessProbe:
+            initialDelaySeconds: 30
+            httpGet:
+              port: https-webhook
+              scheme: HTTPS
+          readinessProbe:
+            httpGet:
+              port: https-webhook
+              scheme: HTTPS
+          resources:
+            limits:
+              cpu: 200m
+              memory: 100Mi
+            requests:
+              cpu: 200m
+              memory: 100Mi
+      nodeSelector:
+        kubernetes.io/os: linux
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: karpenter.sh/provisioner-name
+                operator: DoesNotExist
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+      topologySpreadConstraints:
+        -
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: karpenter
+              app.kubernetes.io/instance: karpenter
+

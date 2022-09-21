@@ -1,0 +1,14 @@
+---
+# Source: karpenter/templates/secret-webhook-cert.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: karpenter-cert
+  namespace: default
+  labels:
+    helm.sh/chart: karpenter-0.16.2
+    app.kubernetes.io/name: karpenter
+    app.kubernetes.io/instance: karpenter
+    app.kubernetes.io/version: "0.16.2"
+    app.kubernetes.io/managed-by: Helm
+data: {} # Injected by karpenter-webhook

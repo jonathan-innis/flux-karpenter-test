@@ -1,0 +1,16 @@
+---
+# Source: karpenter/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: karpenter-global-settings
+  namespace: default
+  labels:
+    helm.sh/chart: karpenter-0.16.2
+    app.kubernetes.io/name: karpenter
+    app.kubernetes.io/instance: karpenter
+    app.kubernetes.io/version: "0.16.2"
+    app.kubernetes.io/managed-by: Helm
+data:
+  "batchMaxDuration": "10s"
+  "batchIdleDuration": "1s"

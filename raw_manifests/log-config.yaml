@@ -1,0 +1,39 @@
+---
+# Source: karpenter/templates/configmap-logging.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-logging
+  namespace: default
+  labels:
+    helm.sh/chart: karpenter-0.16.2
+    app.kubernetes.io/name: karpenter
+    app.kubernetes.io/instance: karpenter
+    app.kubernetes.io/version: "0.16.2"
+    app.kubernetes.io/managed-by: Helm
+data:
+  # https://github.com/uber-go/zap/blob/aa3e73ec0896f8b066ddf668597a02f89628ee50/config.go
+  zap-logger-config: |
+    {
+      "level": "debug",
+      "development": false,
+      "disableStacktrace": true,
+      "disableCaller": true,
+      "sampling": {
+        "initial": 100,
+        "thereafter": 100
+      },
+      "outputPaths": ["stdout"],
+      "errorOutputPaths": ["stderr"],
+      "encoding": "console",
+      "encoderConfig": {
+        "timeKey": "time",
+        "levelKey": "level",
+        "nameKey": "logger",
+        "callerKey": "caller",
+        "messageKey": "message",
+        "stacktraceKey": "stacktrace",
+        "levelEncoder": "capital",
+        "timeEncoder": "iso8601"
+      }
+    }
