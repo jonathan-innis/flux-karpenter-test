@@ -22,3 +22,7 @@ spec:
     clusterEndpoint: https://2B3A0347E5BF8D9935288F4311843065.gr7.us-west-2.eks.amazonaws.com
     aws:
       defaultInstanceProfile: KarpenterNodeInstanceProfile-joinnis-karpenter-demo
+    controller:
+      image: 330700974597.dkr.ecr.us-west-2.amazonaws.com/karpenter/controller@sha256:1c8c13f1cf460ad17ef9cea9aa4d19ca6de735c1440b4026a6f39feeeb6cae14
+    webhook:
+      image: 330700974597.dkr.ecr.us-west-2.amazonaws.com/karpenter/webhook@sha256:52b8daffa4afe464fd789700b52a75fe2c2c1b8b022574e8fecae9f2b6a4b27f
