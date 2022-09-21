@@ -6,11 +6,8 @@ metadata:
   name: karpenter-admin
   labels:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
-    helm.sh/chart: karpenter-0.16.2
     app.kubernetes.io/name: karpenter
     app.kubernetes.io/instance: karpenter
-    app.kubernetes.io/version: "0.16.2"
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups: ["karpenter.sh"]
     resources: ["provisioners", "provisioners/status"]
@@ -25,11 +22,8 @@ kind: ClusterRole
 metadata:
   name: karpenter
   labels:
-    helm.sh/chart: karpenter-0.16.2
     app.kubernetes.io/name: karpenter
     app.kubernetes.io/instance: karpenter
-    app.kubernetes.io/version: "0.16.2"
-    app.kubernetes.io/managed-by: Helm
 rules:
   # Read
   - apiGroups: ["karpenter.sh"]

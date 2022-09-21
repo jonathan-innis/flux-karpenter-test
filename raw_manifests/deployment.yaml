@@ -4,13 +4,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: karpenter
-  namespace: default
+  namespace: karpenter
   labels:
-    helm.sh/chart: karpenter-0.16.2
     app.kubernetes.io/name: karpenter
     app.kubernetes.io/instance: karpenter
-    app.kubernetes.io/version: "0.16.2"
-    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 2
   revisionHistoryLimit: 10
@@ -34,9 +31,15 @@ spec:
       dnsPolicy: Default
       containers:
         - name: controller
-          image: public.ecr.aws/karpenter/controller:v0.16.2@sha256:fc66e0ba44a69cf22ca5732f885d4c8ab69bd46e3c8758788a7f446103270a32
+          image: 330700974597.dkr.ecr.us-west-2.amazonaws.com/karpenter/controller@sha256:7c421cadcdf36d25a66577dcc77bed30f827f978761c80615c81e929f4179ec6
           imagePullPolicy: IfNotPresent
           env:
+            - name: CLUSTER_NAME
+              value: joinnis-karpenter-demo
+            - name: CLUSTER_ENDPOINT
+              value: https://2B3A0347E5BF8D9935288F4311843065.gr7.us-west-2.eks.amazonaws.com
+            - name: AWS_DEFAULT_INSTANCE_PROFILE
+              value: KarpenterNodeInstanceProfile-joinnis-karpenter-demo
             - name: KARPENTER_SERVICE
               value: karpenter
             - name: SYSTEM_NAMESPACE
@@ -75,7 +78,7 @@ spec:
               cpu: 1
               memory: 1Gi
         - name: webhook
-          image: public.ecr.aws/karpenter/webhook:v0.16.2@sha256:47a74a4ba3437e022faae7ed8823cf501f489e860a8200a365f1c994290ea027
+          image: 330700974597.dkr.ecr.us-west-2.amazonaws.com/karpenter/webhook@sha256:51c38e45015c8884faf4694325db5f02f9370c1598dcb7e09b735711d4bbe9b1
           imagePullPolicy: IfNotPresent
           env:
             - name: KUBERNETES_MIN_VERSION

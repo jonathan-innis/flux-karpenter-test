@@ -4,13 +4,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-logging
-  namespace: default
+  namespace: karpenter
   labels:
-    helm.sh/chart: karpenter-0.16.2
     app.kubernetes.io/name: karpenter
     app.kubernetes.io/instance: karpenter
-    app.kubernetes.io/version: "0.16.2"
-    app.kubernetes.io/managed-by: Helm
 data:
   # https://github.com/uber-go/zap/blob/aa3e73ec0896f8b066ddf668597a02f89628ee50/config.go
   zap-logger-config: |

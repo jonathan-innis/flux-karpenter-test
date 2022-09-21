@@ -5,11 +5,8 @@ kind: ClusterRoleBinding
 metadata:
   name: karpenter
   labels:
-    helm.sh/chart: karpenter-0.16.2
     app.kubernetes.io/name: karpenter
     app.kubernetes.io/instance: karpenter
-    app.kubernetes.io/version: "0.16.2"
-    app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -17,4 +14,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: karpenter
-    namespace: default
+    namespace: karpenter
